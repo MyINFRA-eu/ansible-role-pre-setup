@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to <name> will be documented in this file.
+All notable changes to ansible-role-pre-setup will be documented in this file.
 
 ## <version> - <date>
 
