@@ -1,7 +1,7 @@
 ---
 #####
 #
-# @name MyINFRA.eu ~ Ansible <name> Role
+# @name MyINFRA.eu ~ Ansible Pre-Setup Role
 # @version 2025.07.001
 # @since 2025.07.001
 #
@@ -11,20 +11,55 @@
 #
 ###
 #
-# Ansible role for <description>
+# Ansible role to install required python packages on clean target.
 #
 #####
 
 - name: "Copyright & Version information"
   ansible.builtin.debug:
     msg:
-      - "MyINFRA.eu ~ Ansible <name> Role"
-      - "Version   : {{ myinfra.<name>.version }}"
+      - "MyINFRA.eu ~ Ansible Pre-Setup Role"
+      - "Version   : {{ myinfra.pre_setup.version }}"
       - "Copyright : (c) 2025 (and beyond) - Dennis de Houx, All In One, One For The code"
       - "Author    : Dennis de Houx <dennis@dehoux.be>"
       - "License   : https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en CC BY-NC-ND 4.0"
 
-- name: "Load: Gather facts tasks"
-  ansible.builtin.import_tasks: gather.yml
+- name: "PRE-SETUP > Bootstrap host update apt repository"
+  raw: sudo apt update -y
   tags:
-    - <short_name>_gather_facts
+    - pre_setup
+  when:
+    - ansible_os_family == 'Debian'
+    - pre-setup.install is defined and pre-setup.install is true
+
+- name: "PRE-SETUP > Bootstrap host without python installed"
+  raw: sudo apt install -y python3
+  tags:
+    - pre_setup
+  when:
+    - ansible_os_family == 'Debian'
+    - pre-setup.install is defined and pre-setup.install is true
+
+- name: "PRE-SETUP > Bootstrap host without sudo installed"
+  ansible.builtin.package:
+    name:
+      - sudo
+    state: present
+  tags:
+    - pre_setup
+  when:
+    - ansible_os_family == 'Debian'
+    - pre-setup.install is defined and pre-setup.install is true
+
+- name: "PRE-SETUP > Create python symbolic link"
+  file:
+    src: /usr/bin/python3
+    dest: /usr/bin/python
+    owner: root
+    group: root
+    state: link
+  tags:
+    - pre_setup
+  when:
+    - ansible_os_family == 'Debian'
+    - pre-setup.install is defined and pre-setup.install is true
